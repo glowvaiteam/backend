@@ -12,7 +12,7 @@ app = FastAPI(title="Glowvai Backend")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://glowvai.netlify.app", "*"],
+    allow_origins=["https://glowvai.netlify.app", "http://localhost:5173"  ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
