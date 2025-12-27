@@ -1,0 +1,28 @@
+# Secrets
+firebase_key.json
+.env
+.env.local
+
+# Python
+__pycache__/
+*.pyc
+
+# Virtual env
+venv/
+# Environment & secrets
+.env
+firebase_key.json
+
+# Virtual environments
+venv/
+venv310/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Uploads (generated files)
+uploads/
+
+# OS files
+.DS_Store

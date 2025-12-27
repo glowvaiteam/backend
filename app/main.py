@@ -1,0 +1,27 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+
+from app.auth.auth_routes import router as auth_router
+from app.ml.routes import router as ml_router
+from app.users.user_routes import router as user_router
+
+load_dotenv()  # 👈 load Cloudflare env variables
+
+app = FastAPI(title="Glowvai Backend")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(auth_router, prefix="/api/auth", tags=["Auth"])
+app.include_router(ml_router, prefix="/api/ml", tags=["ML"])
+app.include_router(user_router, prefix="/api/user", tags=["User"])
+
+@app.get("/")
+def root():
+    return {"message": "Glowvai backend is running"}
