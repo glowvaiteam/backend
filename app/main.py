@@ -6,13 +6,19 @@ from app.auth.auth_routes import router as auth_router
 from app.ml.routes import router as ml_router
 from app.users.user_routes import router as user_router
 
-load_dotenv()  # 👈 load Cloudflare env variables
+load_dotenv()
 
 app = FastAPI(title="Glowvai Backend")
 
+# ✅ FIXED CORS CONFIG
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["glowvai.vercel.app", "http://localhost:5173"  ],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:8080",
+        "https://glowvai.vercel.app",
+        "https://glowvai.netlify.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
