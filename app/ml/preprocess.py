@@ -3,15 +3,15 @@ import numpy as np
 import io
 import requests
 import torchvision.transforms as transforms
-import mediapipe as mp
+from mediapipe.python.solutions.face_detection import FaceDetection
 from fastapi import HTTPException
 
 # MediaPipe face detector
-mp_face = mp.solutions.face_detection
-face_detector = mp_face.FaceDetection(
+face_detector = FaceDetection(
     model_selection=1,
     min_detection_confidence=0.6
 )
+
 
 # Torch transform (must match training)
 transform = transforms.Compose([
