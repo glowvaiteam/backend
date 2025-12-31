@@ -22,6 +22,8 @@ app.add_middleware(
         "http://localhost:8080",
         "https://glowvai.vercel.app",
         "https://glowvai.netlify.app",
+        "https://glowvai.in",
+        
     ],
     allow_credentials=True,
     allow_methods=["*"],
