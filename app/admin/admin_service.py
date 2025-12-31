@@ -100,20 +100,33 @@ def get_today_users():
     result = []
 
     users = db.collection("users").stream()
+
     for u in users:
         data = u.to_dict()
-        last_active = to_ist(data.get("last_active_at"))
 
-        if last_active and last_active >= today_start:
-            result.append({
-                "id": u.id,
-                "full_name": data.get("full_name"),
-                "email": data.get("email"),
-                "today_analysis_count": get_today_analysis(u.id),
-            })
+        last_active = to_ist(data.get("last_active_at"))
+        if not last_active or last_active < today_start:
+            continue  # ❌ not active today
+
+        # ✅ COUNT ONLY TODAY ANALYSIS
+        today_analysis = 0
+        analyses = db.collection("analyses") \
+            .where("uid", "==", u.id) \
+            .stream()
+
+        for a in analyses:
+            created = to_ist(a.to_dict().get("created_at"))
+            if created and created >= today_start:
+                today_analysis += 1
+
+        result.append({
+            "id": u.id,
+            "full_name": data.get("full_name"),
+            "email": data.get("email"),
+            "today_analysis_count": today_analysis
+        })
 
     return result
-
 
 # ---------------- HELPERS ----------------
 def get_total_analysis(uid: str):
