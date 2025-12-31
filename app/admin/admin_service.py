@@ -29,9 +29,9 @@ def get_summary():
 
     for u in users:
         data = u.to_dict()
-        updated = to_ist(data.get("updated_at"))
+        last_active = to_ist(data.get("last_active_at"))  # ✅ FIX
 
-        if updated and updated >= today_start:
+        if last_active and last_active >= today_start:
             active_users += 1
 
     return {
@@ -51,11 +51,11 @@ def get_registrations(time_range: str):
             continue
 
         if time_range == "Daily":
-            key = created.strftime("%d %b")        # 30 Dec
+            key = created.strftime("%d %b")
         elif time_range == "Weekly":
-            key = created.strftime("%A")           # Monday
+            key = created.strftime("%A")
         else:
-            key = created.strftime("%B")           # December
+            key = created.strftime("%B")
 
         buckets[key] = buckets.get(key, 0) + 1
 
@@ -92,9 +92,9 @@ def get_today_users():
     users = db.collection("users").stream()
     for u in users:
         data = u.to_dict()
-        updated = to_ist(data.get("updated_at"))
+        last_active = to_ist(data.get("last_active_at"))  # ✅ FIX
 
-        if updated and updated >= today_start:
+        if last_active and last_active >= today_start:
             result.append({
                 "id": u.id,
                 "full_name": data.get("full_name"),
