@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta, timezone
-from google.cloud.firestore_v1 import Timestamp
 from app.core.firebase import db
 
 # ================= TIMEZONE =================
@@ -13,14 +12,17 @@ def get_today_start():
 
 def to_ist(dt):
     """
-    Convert Firestore Timestamp -> IST datetime safely
+    Convert Firestore timestamp (or datetime) to IST safely
+    Firestore already returns datetime objects
     """
     if not dt:
         return None
 
-    if isinstance(dt, Timestamp):
+    # Firestore Timestamp -> datetime (already converted by SDK)
+    if hasattr(dt, "to_datetime"):
         dt = dt.to_datetime()
 
+    # Ensure timezone awareness
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=timezone.utc)
 
@@ -59,11 +61,11 @@ def get_registrations(time_range: str):
             continue
 
         if time_range == "Daily":
-            key = created.strftime("%d %b")
+            key = created.strftime("%d %b")       # 30 Dec
         elif time_range == "Weekly":
-            key = created.strftime("%A")
+            key = created.strftime("%A")          # Monday
         else:
-            key = created.strftime("%B")
+            key = created.strftime("%B")          # December
 
         buckets[key] = buckets.get(key, 0) + 1
 
