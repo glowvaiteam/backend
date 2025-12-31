@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from google.cloud.firestore_v1 import Timestamp
 from app.core.firebase import db
 
 # ================= TIMEZONE =================
@@ -16,7 +17,14 @@ def to_ist(dt):
     """
     if not dt:
         return None
-    return dt.replace(tzinfo=IST)
+
+    if isinstance(dt, Timestamp):
+        dt = dt.to_datetime()
+
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+
+    return dt.astimezone(IST)
 
 
 # ---------------- TOTAL & ACTIVE USERS ----------------
@@ -29,7 +37,7 @@ def get_summary():
 
     for u in users:
         data = u.to_dict()
-        last_active = to_ist(data.get("last_active_at"))  # ✅ FIX
+        last_active = to_ist(data.get("last_active_at"))
 
         if last_active and last_active >= today_start:
             active_users += 1
@@ -92,7 +100,7 @@ def get_today_users():
     users = db.collection("users").stream()
     for u in users:
         data = u.to_dict()
-        last_active = to_ist(data.get("last_active_at"))  # ✅ FIX
+        last_active = to_ist(data.get("last_active_at"))
 
         if last_active and last_active >= today_start:
             result.append({

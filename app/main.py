@@ -6,6 +6,7 @@ from app.auth.auth_routes import router as auth_router
 from app.ml.routes import router as ml_router
 from app.users.user_routes import router as user_router
 from app.admin.admin_routes import router as admin_router
+from app.users.activity_routes import router as activity_router
 
 
 load_dotenv()
@@ -30,6 +31,7 @@ app.include_router(auth_router, prefix="/api/auth", tags=["Auth"])
 app.include_router(ml_router, prefix="/api/ml", tags=["ML"])
 app.include_router(user_router, prefix="/api/user", tags=["User"])
 app.include_router(admin_router, prefix="/api/admin", tags=["Admin"])
+app.include_router(activity_router, prefix="/api/user", tags=["Activity"])
 
 @app.get("/")
 def root():
