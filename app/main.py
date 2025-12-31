@@ -9,6 +9,7 @@ from app.admin.admin_routes import router as admin_router
 from app.users.activity_routes import router as activity_router
 
 
+
 load_dotenv()
 
 app = FastAPI(title="Glowvai Backend")
@@ -32,6 +33,7 @@ app.include_router(ml_router, prefix="/api/ml", tags=["ML"])
 app.include_router(user_router, prefix="/api/user", tags=["User"])
 app.include_router(admin_router, prefix="/api/admin", tags=["Admin"])
 app.include_router(activity_router, prefix="/api/user", tags=["Activity"])
+
 
 @app.get("/")
 def root():
