@@ -103,17 +103,14 @@ def get_today_users():
 
     for u in users:
         data = u.to_dict()
-
         last_active = to_ist(data.get("last_active_at"))
+
         if not last_active or last_active < today_start:
-            continue  # ❌ not active today
+            continue
 
-        # ✅ COUNT ONLY TODAY ANALYSIS
         today_analysis = 0
-        analyses = db.collection("analyses") \
-            .where("uid", "==", u.id) \
-            .stream()
 
+        analyses = db.collection("analyses").where("uid", "==", u.id).stream()
         for a in analyses:
             created = to_ist(a.to_dict().get("created_at"))
             if created and created >= today_start:
