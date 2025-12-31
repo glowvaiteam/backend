@@ -1,5 +1,22 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from app.core.firebase import db
+
+# ================= TIMEZONE =================
+IST = timezone(timedelta(hours=5, minutes=30))
+
+
+def get_today_start():
+    now = datetime.now(IST)
+    return now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+
+def to_ist(dt):
+    """
+    Convert Firestore Timestamp -> IST datetime safely
+    """
+    if not dt:
+        return None
+    return dt.replace(tzinfo=IST)
 
 
 # ---------------- TOTAL & ACTIVE USERS ----------------
@@ -7,13 +24,14 @@ def get_summary():
     users = list(db.collection("users").stream())
     total_users = len(users)
 
-    today = datetime.utcnow().replace(hour=0, minute=0, second=0)
+    today_start = get_today_start()
     active_users = 0
 
     for u in users:
         data = u.to_dict()
-        updated = data.get("updated_at")
-        if updated and updated.replace(tzinfo=None) >= today:
+        updated = to_ist(data.get("updated_at"))
+
+        if updated and updated >= today_start:
             active_users += 1
 
     return {
@@ -28,18 +46,16 @@ def get_registrations(time_range: str):
     buckets = {}
 
     for u in users:
-        created = u.to_dict().get("created_at")
+        created = to_ist(u.to_dict().get("created_at"))
         if not created:
             continue
 
-        dt = created.replace(tzinfo=None)
-
         if time_range == "Daily":
-            key = dt.strftime("%H:00")
+            key = created.strftime("%d %b")        # 30 Dec
         elif time_range == "Weekly":
-            key = dt.strftime("%A")
+            key = created.strftime("%A")           # Monday
         else:
-            key = dt.strftime("%B")
+            key = created.strftime("%B")           # December
 
         buckets[key] = buckets.get(key, 0) + 1
 
@@ -70,15 +86,15 @@ def get_all_users():
 
 # ---------------- TODAY ACTIVE USERS ----------------
 def get_today_users():
-    today = datetime.utcnow().replace(hour=0, minute=0, second=0)
+    today_start = get_today_start()
     result = []
 
     users = db.collection("users").stream()
     for u in users:
         data = u.to_dict()
-        updated = data.get("updated_at")
+        updated = to_ist(data.get("updated_at"))
 
-        if updated and updated.replace(tzinfo=None) >= today:
+        if updated and updated >= today_start:
             result.append({
                 "id": u.id,
                 "full_name": data.get("full_name"),
@@ -96,13 +112,13 @@ def get_total_analysis(uid: str):
 
 
 def get_today_analysis(uid: str):
-    today = datetime.utcnow().replace(hour=0, minute=0, second=0)
+    today_start = get_today_start()
     count = 0
 
     analyses = db.collection("analyses").where("uid", "==", uid).stream()
     for a in analyses:
-        created = a.to_dict().get("created_at")
-        if created and created.replace(tzinfo=None) >= today:
+        created = to_ist(a.to_dict().get("created_at"))
+        if created and created >= today_start:
             count += 1
 
     return count
