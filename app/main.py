@@ -13,6 +13,12 @@ from app.users.activity_routes import router as activity_router
 load_dotenv()
 
 app = FastAPI(title="Glowvai Backend")
+@app.middleware("http")
+async def add_coop_header(request, call_next):
+    response = await call_next(request)
+    response.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
+    return response
+
 
 # ✅ FIXED CORS CONFIG
 app.add_middleware(
