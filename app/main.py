@@ -24,6 +24,7 @@ app.add_middleware(
         "https://glowvai.netlify.app",
         "https://glowvai.in",
         "https://www.glowvai.in",
+        "https://admin.glowvai.vercel.app"
         
     ],
     allow_credentials=True,
