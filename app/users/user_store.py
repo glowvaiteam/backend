@@ -25,21 +25,34 @@ def get_user(uid: str):
 
     return doc.to_dict()
 
+from datetime import datetime
 
 def update_profile(uid: str, data: dict):
-    """Update user profile fields. Expects a dict of allowed fields.
-
-    This will set `profile_completed` to True when called.
-    """
     ref = db.collection("users").document(uid)
     doc = ref.get()
-    if not doc.exists:
-        raise Exception("User not found")
 
-    allowed = ["full_name", "age", "gender", "height", "weight", "profile_image", "profile_completed"]
+    # ✅ CREATE USER IF NOT EXISTS
+    if not doc.exists:
+        ref.set({
+            "uid": uid,
+            "created_at": datetime.utcnow(),
+        })
+
+    allowed = [
+        "full_name",
+        "age",
+        "gender",
+        "height",
+        "weight",
+        "profile_image",
+        "profile_completed",
+    ]
+
     payload = {k: v for k, v in data.items() if k in allowed}
     payload["profile_completed"] = True
     payload["updated_at"] = datetime.utcnow()
 
-    ref.update(payload)
+    # ✅ SAFE WRITE (NO CRASH)
+    ref.set(payload, merge=True)
+
     return ref.get().to_dict()

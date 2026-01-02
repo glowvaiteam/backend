@@ -11,8 +11,13 @@ def mark_user_active(user=Depends(verify_firebase_user)):
     if not uid:
         return {"status": "error", "message": "Invalid user"}
 
-    db.collection("users").document(uid).update({
-        "last_active_at": datetime.now(timezone.utc)
-    })
+    db.collection("users").document(uid).set(
+    {
+        "uid": uid,
+        "last_active_at": datetime.now(timezone.utc),
+    },
+    merge=True
+)
+
 
     return {"status": "ok"}

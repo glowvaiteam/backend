@@ -13,7 +13,17 @@ def profile(user=Depends(verify_firebase_user)):
     if not uid:
         raise HTTPException(status_code=401, detail="Invalid user")
 
-    user_doc = get_user(uid)
+    # ✅ SAFE: no crash if user doc does not exist
+    try:
+        user_doc = get_user(uid)
+    except:
+        user_doc = {
+            "uid": uid,
+            "full_name": user.get("name"),
+            "email": user.get("email"),
+            "profile_completed": False,
+        }
+
     history = get_user_ml_history(uid) or []
 
     return {
@@ -29,6 +39,7 @@ def profile(user=Depends(verify_firebase_user)):
         "analysis_count": len(history),
         "history": history,
     }
+
 
 
 @router.post("/profile")
